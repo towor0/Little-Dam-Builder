@@ -19,6 +19,18 @@ class Map:
         self.load_tiles()
         self.load_objs()
         self.tileSheetAnim = 0
+        self.treeHit = {
+            None: 500,
+            "wooden_axe": 300,
+            "stone_axe": 100
+        }
+        self.treecur = 500
+        self.boulderhit = {
+            None: None,
+            "wooden_pick": 500,
+            "stone_pick": 300
+        }
+        self.bouldercur = None
 
     def load_tiles(self):
         with open(os.path.join("assets", "map", "map.json")) as f:
@@ -68,9 +80,11 @@ class Map:
                 if type(obj).__name__ == "Tree":
                     self.dropSticks(obj.getCenter())
                     if obj.treeType == 2:
-                        self.dropApple(obj.getCenter())
+                        self.dropApples(obj.getCenter())
                     if obj.treeType == 3:
-                        self.dropFlower(obj.getCenter())
+                        self.dropFlowers(obj.getCenter())
+                elif type(obj).__name__ == "Boulder":
+                    self.dropRocks(obj.getCenter())
                 self.layer[1].pop(self.layer[1].index(obj))
         if self.tileSheetAnim > 5:
             self.tileSheetAnim = 0
@@ -81,18 +95,44 @@ class Map:
             drop.update(dt, events, bub)
             if drop.collected:
                 self.drops.pop(self.drops.index(drop))
+        if bub.inventory.items["stone_axe"] and self.treecur > self.treeHit["stone_axe"]:
+            self.treecur = self.treeHit["stone_axe"]
+            self.updateTrees()
+        elif bub.inventory.items["wooden_axe"] and self.treecur > self.treeHit["wooden_axe"]:
+            self.treecur = self.treeHit["wooden_axe"]
+            self.updateTrees()
+        if bub.inventory.items["stone_pick"] and self.bouldercur > self.boulderhit["stone_pick"]:
+            self.bouldercur = self.boulderhit["stone_pick"]
+            self.updateTrees()
+        elif bub.inventory.items["wooden_pick"] and not self.bouldercur:
+            self.bouldercur = self.boulderhit["wooden_pick"]
+            self.updateBoulders()
+
+    def updateTrees(self):
+        for obj in self.layer[1]:
+            if type(obj).__name__ == "Tree":
+                obj.hitcount = self.treecur
+
+    def updateBoulders(self):
+        for obj in self.layer[1]:
+            if type(obj).__name__ == "Boulder":
+                obj.hitcount = self.bouldercur
 
     def dropSticks(self, pos):
-        for i in range(random.randint(3, 6)):
+        for i in range(random.randint(4, 7)):
             self.drops.append(Stick(pos))
 
-    def dropApple(self, pos):
-        for i in range(random.randint(2, 4)):
+    def dropApples(self, pos):
+        for i in range(random.randint(3, 4)):
             self.drops.append(Apple(pos))
-    
-    def dropFlower(self, pos):
-        for i in range(random.randint(1, 3)):
+
+    def dropFlowers(self, pos):
+        for i in range(random.randint(3, 5)):
             self.drops.append(Flower(pos))
+
+    def dropRocks(self, pos):
+        for i in range(random.randint(7, 10)):
+            self.drops.append(Rock(pos))
 
     def draw(self, window, camera):
         for tile in self.layer[0]:

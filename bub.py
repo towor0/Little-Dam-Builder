@@ -3,7 +3,7 @@ from helper import image_load
 
 
 class Bub:
-    def __init__(self):
+    def __init__(self, pos):
         self.sprite = {
             "land": {
                 "01": image_load("assets/bub/bub_down.png"),
@@ -26,7 +26,7 @@ class Bub:
                 "-1-1": image_load("assets/bub/bub_water_upleft.png"),
             },
         }
-        self.pos = pygame.Vector2(64*32, 64*32)
+        self.pos = pos
         self.offset = pygame.Vector2(0, 0)
         self.rect = pygame.Rect(self.pos.x, self.pos.y, 32, 32)
         self.vel = pygame.Vector2(0, 0)
@@ -44,10 +44,10 @@ class Bub:
                 "rock": 0,
                 "flower": 0,
                 "apple": 0,
-                "wooden axe": 0,
-                "wooden pick": 0,
-                "stone axe": 0,
-                "stone pick": 0,
+                "wooden_axe": 0,
+                "wooden_pick": 0,
+                "stone_axe": 0,
+                "stone_pick": 0,
             }
 
         def add(self, name):

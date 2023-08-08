@@ -23,7 +23,7 @@ class Tree:
             if events["mouse_pressed"][0]:
                 point = camera.mouseToGamePos(events["mouse_pos"])
                 if self.clickRect.collidepoint(point.x, point.y):
-                    if camera.getDistance(self.pos + pygame.Vector2(42+23, 106+5)) < 100:
+                    if camera.getDistance(self.getCenter()) < 100:
                         self.hitcount -= dt
                         camera.shake(dt, 2)
                         if self.hitcount < 1:
