@@ -11,6 +11,7 @@ class Camera:
         self.shaketime = 0
         self.centerpos = pygame.Vector2(pos.x, pos.y)
         self.smooth = 9
+        self.limit = pygame.Rect(0, 0, 64 * 64, 64 * 64)
 
     def shake(self, time):
         self.shaketime += time
@@ -27,6 +28,14 @@ class Camera:
             self.centerpos.y += random.randint(-4, 4)
         self.rect.centerx = self.centerpos.x
         self.rect.centery = self.centerpos.y
+        if self.rect.x < self.limit.x:
+            self.rect.x = self.limit.x
+        if self.rect.right > self.limit.x + self.limit.width:
+            self.rect.right = self.limit.x + self.limit.width
+        if self.rect.y < self.limit.y:
+            self.rect.y = self.limit.y
+        if self.rect.bottom > self.limit.y + self.limit.height:
+            self.rect.bottom = self.limit.y + self.limit.height
 
     def cameraPos(self, pos):
         return pygame.Vector2(pos.x - self.rect.x, pos.y - self.rect.y)

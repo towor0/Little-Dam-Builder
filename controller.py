@@ -22,6 +22,7 @@ class GameController:
         self.map = Map()
 
     def update(self, dt, events):
+        self.bub.collision.update_objects("tile", self.map.layer[0])
         self.bub.update(dt, events)
         self.map.update(dt, events)
         self.camera.update(dt, events, self.bub.rect.center)
