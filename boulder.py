@@ -7,10 +7,13 @@ class Boulder:
     def __init__(self, pos):
         self.pos = pos
         self.objsize = 128
-        self.rect = pygame.Rect(pos.x, pos.y, self.objsize, self.objsize)
+        self.rect = pygame.Rect(pos.x + 2, pos.y + 86, 124, 36)
+        self.clickRect = pygame.Rect(pos.x, pos.y, 128, 128)
         self.mask = "obj"
+        self.status = "active"
+        self.hitcount = 100
 
-    def update(self, dt, events):
+    def update(self, dt, events, camera):
         pass
 
     def draw(self, window, camera):

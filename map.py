@@ -10,7 +10,6 @@ class Map:
     def __init__(self):
         self.raw = []
         self.layer = []
-        self.objs = []
         self.size = 64
         self.tilesize = 64
         self.objmapsize = 32
@@ -57,14 +56,14 @@ class Map:
                     rawtempl = []
             if len(templ) != 0:
                 self.layer.append(templ)
-            print(templ)
 
-    def update(self, dt, events):
-        for tiles in self.layer:
-            for tile in tiles:
-                tile.update(dt, events)
-        for obj in self.objs:
-            obj.update(dt, events)
+    def update(self, dt, events, camera):
+        for tile in self.layer[0]:
+            tile.update(dt, events)
+        for obj in self.layer[1]:
+            obj.update(dt, events, camera)
+            if obj.status == "destroyed":
+                self.layer[1].pop(self.layer[1].index(obj))
         if self.tileSheetAnim > 5:
             self.tileSheetAnim = 0
             Tile.nextSheet()
@@ -72,9 +71,8 @@ class Map:
             self.tileSheetAnim += dt
 
     def draw(self, window, camera):
-        for tiles in self.layer:
-            for tile in tiles:
-                tile.draw(window, camera)
+        for tile in self.layer[0]:
+            tile.draw(window, camera)
 
 
 class Tile:

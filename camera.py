@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 
 class Camera:
@@ -12,9 +13,11 @@ class Camera:
         self.centerpos = pygame.Vector2(pos.x, pos.y)
         self.smooth = 9
         self.limit = pygame.Rect(0, 0, 64 * 64, 64 * 64)
+        self.intensity = 4
 
-    def shake(self, time):
+    def shake(self, time, intensity):
         self.shaketime += time
+        self.intensity = intensity
 
     def update(self, dt, events, focus):
         # camera smoothening
@@ -24,8 +27,8 @@ class Camera:
         # apply camera shakes
         if self.shaketime > 0:
             self.shaketime -= dt
-            self.centerpos.x += random.randint(-4, 4)
-            self.centerpos.y += random.randint(-4, 4)
+            self.centerpos.x += random.randint(-self.intensity, self.intensity)
+            self.centerpos.y += random.randint(-self.intensity, self.intensity)
         self.rect.centerx = self.centerpos.x
         self.rect.centery = self.centerpos.y
         if self.rect.x < self.limit.x:
@@ -40,5 +43,12 @@ class Camera:
     def cameraPos(self, pos):
         return pygame.Vector2(pos.x - self.rect.x, pos.y - self.rect.y)
 
+    def mouseToGamePos(self, pos):
+        return pygame.Vector2(pos.x + self.rect.x, pos.y + self.rect.y)
+
     def backgroundPos(self, effect):
         return pygame.Vector2(-self.rect.x/effect, -self.rect.y/effect)
+
+    def getDistance(self, pos):
+        return self.centerpos.distance_to(pos)
+

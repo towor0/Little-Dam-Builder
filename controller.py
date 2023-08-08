@@ -23,11 +23,22 @@ class GameController:
 
     def update(self, dt, events):
         self.bub.collision.update_objects("tile", self.map.layer[0])
+        self.bub.collision.update_objects("obj", self.map.layer[1])
         self.bub.update(dt, events)
-        self.map.update(dt, events)
         self.camera.update(dt, events, self.bub.rect.center)
+        self.map.update(dt, events, self.camera)
 
     def draw(self, window):
         self.map.draw(window, self.camera)
-        self.bub.draw(window, self.camera)
+        bubDrawn = False
+        for obj in self.map.layer[1]:
+            if not bubDrawn:
+                if obj.rect.bottom > self.bub.rect.bottom:
+                    self.bub.draw(window, self.camera)
+                    obj.draw(window, self.camera)
+                    bubDrawn = True
+                else:
+                    obj.draw(window, self.camera)
+            else:
+                obj.draw(window, self.camera)
 

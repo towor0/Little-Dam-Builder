@@ -5,25 +5,45 @@ from helper import image_load
 class Bub:
     def __init__(self):
         self.sprite = {
-            "land": image_load("assets/bub/bub.png"),
-            "water": image_load("assets/bub/bub_water.png")
+            "land": {
+                "01": image_load("assets/bub/bub_down.png"),
+                "11": image_load("assets/bub/bub_downright.png"),
+                "-11": image_load("assets/bub/bub_downleft.png"),
+                "10": image_load("assets/bub/bub_right.png"),
+                "-10": image_load("assets/bub/bub_left.png"),
+                "0-1": image_load("assets/bub/bub_up.png"),
+                "1-1": image_load("assets/bub/bub_upright.png"),
+                "-1-1": image_load("assets/bub/bub_upleft.png"),
+            },
+            "water": {
+                "01": image_load("assets/bub/bub_water_down.png"),
+                "11": image_load("assets/bub/bub_water_downright.png"),
+                "-11": image_load("assets/bub/bub_water_downleft.png"),
+                "10": image_load("assets/bub/bub_water_right.png"),
+                "-10": image_load("assets/bub/bub_water_left.png"),
+                "0-1": image_load("assets/bub/bub_water_up.png"),
+                "1-1": image_load("assets/bub/bub_water_upright.png"),
+                "-1-1": image_load("assets/bub/bub_water_upleft.png"),
+            },
         }
         self.pos = pygame.Vector2(64*32, 64*32)
+        self.offset = pygame.Vector2(0, 0)
         self.rect = pygame.Rect(self.pos.x, self.pos.y, 32, 32)
         self.vel = pygame.Vector2(0, 0)
         self.speed = 4
         self.mode = "land"
         self.collision = self.CollisionHandler(self.pos)
+        self.dir = "01"
 
     class CollisionHandler:
         def __init__(self, pos):
             self.collision_mask = {
-                "objects": [],
+                "obj": [],
                 "tile": []
             }
             self.collision = []
             self.pos = pos
-            self.rect = pygame.Rect(pos.x, pos.y, 24, 32)
+            self.rect = pygame.Rect(pos.x, pos.y, 32, 32)
             self.air_time = 0
 
         def update(self, dt, events):
@@ -31,7 +51,7 @@ class Bub:
 
         def update_player(self, pos):
             self.pos = pos
-            self.rect = pygame.Rect(pos.x, pos.y, 24, 32)
+            self.rect = pygame.Rect(pos.x, pos.y, 32, 32)
 
         def update_collision(self, mask):
             self.collision = []
@@ -56,7 +76,7 @@ class Bub:
                 if tile.rect.collidepoint(self.rect.centerx, self.rect.centery):
                     if tile.tileNum == 3:
                         mode = "water"
-            self.update_collision("objects")
+            self.update_collision("obj")
             for obj in self.collision:
                 if vel.x > 0:
                     self.rect.right = obj.rect.left
@@ -67,7 +87,7 @@ class Bub:
                     self.pos.x = self.rect.x
                     facing.append("left")
             self.update_player(self.pos + pygame.Vector2(0, vel.y))
-            self.update_collision("objects")
+            self.update_collision("obj")
             for obj in self.collision:
                 if vel.y > 0:
                     self.rect.bottom = obj.rect.top
@@ -98,12 +118,13 @@ class Bub:
             "vertical": 0,
             "horizontal": 0
         }
+        dirChange = False
         if events["keys"][pygame.K_d]:
             movementDirection["horizontal"] += 1
-        if events["keys"][pygame.K_a]:
-            movementDirection["horizontal"] -= 1
         if events["keys"][pygame.K_w]:
             movementDirection["vertical"] -= 1
+        if events["keys"][pygame.K_a]:
+            movementDirection["horizontal"] -= 1
         if events["keys"][pygame.K_s]:
             movementDirection["vertical"] += 1
         if movementDirection["vertical"] != 0 and movementDirection["horizontal"] != 0:
@@ -112,6 +133,9 @@ class Bub:
         else:
             cvel.x += movementDirection["horizontal"] * self.speed
             cvel.y += movementDirection["vertical"] * self.speed
+        dir = str(movementDirection["horizontal"]) + str(movementDirection["vertical"])
+        if dir != "00":
+            self.dir = dir
         return cvel
 
     def update(self, dt, events):
@@ -121,4 +145,4 @@ class Bub:
         self.rect, self.pos, facing, self.mode = self.collision.get_pos(cvel)
 
     def draw(self, window, camera):
-        window.blit(self.sprite[self.mode], camera.cameraPos(self.pos))
+        window.blit(self.sprite[self.mode][self.dir], camera.cameraPos(self.pos - self.offset))

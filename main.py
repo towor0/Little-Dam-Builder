@@ -29,7 +29,8 @@ while running:
         "events": pygame.event.get(),
         "keys": pygame.key.get_pressed(),
         "mod_keys": pygame.key.get_mods(),
-        "mouse_pos": pygame.mouse.get_pos(),
+        "mouse_pos": pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+        "mouse_pressed": pygame.mouse.get_pressed(),
     }
     for event in events["events"]:
         if event.type == pygame.QUIT:
