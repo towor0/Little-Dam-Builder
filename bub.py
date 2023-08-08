@@ -31,15 +31,37 @@ class Bub:
         self.rect = pygame.Rect(self.pos.x, self.pos.y, 32, 32)
         self.vel = pygame.Vector2(0, 0)
         self.speed = 4
+        self.waterspeed = 3
         self.mode = "land"
         self.collision = self.CollisionHandler(self.pos)
         self.dir = "01"
+        self.inventory = self.Inventory()
+
+    class Inventory:
+        def __init__(self):
+            self.items = {
+                "stick": 0,
+                "rock": 0,
+                "flower": 0,
+                "apple": 0,
+                "wooden axe": 0,
+                "wooden pick": 0,
+                "stone axe": 0,
+                "stone pick": 0,
+            }
+
+        def add(self, name):
+            self.items[name] += 1
+
+        def take(self, name, num):
+            self.items[name] -= num
 
     class CollisionHandler:
         def __init__(self, pos):
             self.collision_mask = {
                 "obj": [],
-                "tile": []
+                "tile": [],
+                "drop": []
             }
             self.collision = []
             self.pos = pos
@@ -128,15 +150,25 @@ class Bub:
         if events["keys"][pygame.K_s]:
             movementDirection["vertical"] += 1
         if movementDirection["vertical"] != 0 and movementDirection["horizontal"] != 0:
-            cvel.x += 0.71 * movementDirection["horizontal"] * self.speed
-            cvel.y += 0.71 * movementDirection["vertical"] * self.speed
+            if self.mode == "land":
+                cvel.x += 0.71 * movementDirection["horizontal"] * self.speed
+                cvel.y += 0.71 * movementDirection["vertical"] * self.speed
+            else:
+                cvel.x += 0.71 * movementDirection["horizontal"] * self.waterspeed
+                cvel.y += 0.71 * movementDirection["vertical"] * self.waterspeed
         else:
-            cvel.x += movementDirection["horizontal"] * self.speed
-            cvel.y += movementDirection["vertical"] * self.speed
+            if self.mode == "land":
+                cvel.x += movementDirection["horizontal"] * self.speed
+                cvel.y += movementDirection["vertical"] * self.speed
+            else:
+                cvel.x += 0.71 * movementDirection["horizontal"] * self.waterspeed
+                cvel.y += 0.71 * movementDirection["vertical"] * self.waterspeed
         dir = str(movementDirection["horizontal"]) + str(movementDirection["vertical"])
         if dir != "00":
             self.dir = dir
-        return cvel
+        if self.mode == "water":
+            cvel.x -= 1
+        return cvel * dt
 
     def update(self, dt, events):
         cvel = self.move(dt, events)

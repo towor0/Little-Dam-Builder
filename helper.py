@@ -2,7 +2,10 @@ import pygame
 import os
 
 
+def getPath(p):
+    return os.path.join(*p.split("/"))
+
+
 def image_load(p):
-    path = os.path.join(*p.split("/"))
-    image = pygame.image.load(path).convert_alpha()
+    image = pygame.image.load(getPath(p)).convert_alpha()
     return image

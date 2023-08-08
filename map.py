@@ -4,12 +4,14 @@ import os
 from helper import image_load
 from tree import Tree
 from boulder import Boulder
+from drops import *
 
 
 class Map:
     def __init__(self):
         self.raw = []
         self.layer = []
+        self.drops = []
         self.size = 64
         self.tilesize = 64
         self.objmapsize = 32
@@ -57,22 +59,48 @@ class Map:
             if len(templ) != 0:
                 self.layer.append(templ)
 
-    def update(self, dt, events, camera):
+    def update(self, dt, events, camera, bub):
         for tile in self.layer[0]:
             tile.update(dt, events)
         for obj in self.layer[1]:
-            obj.update(dt, events, camera)
+            obj.update(dt, events, camera, bub)
             if obj.status == "destroyed":
+                if type(obj).__name__ == "Tree":
+                    self.dropSticks(obj.getCenter())
+                    if obj.treeType == 2:
+                        self.dropApple(obj.getCenter())
+                    if obj.treeType == 3:
+                        self.dropFlower(obj.getCenter())
                 self.layer[1].pop(self.layer[1].index(obj))
         if self.tileSheetAnim > 5:
             self.tileSheetAnim = 0
             Tile.nextSheet()
         else:
             self.tileSheetAnim += dt
+        for drop in self.drops:
+            drop.update(dt, events, bub)
+            if drop.collected:
+                self.drops.pop(self.drops.index(drop))
+
+    def dropSticks(self, pos):
+        for i in range(random.randint(3, 6)):
+            self.drops.append(Stick(pos))
+
+    def dropApple(self, pos):
+        for i in range(random.randint(2, 4)):
+            self.drops.append(Apple(pos))
+    
+    def dropFlower(self, pos):
+        for i in range(random.randint(1, 3)):
+            self.drops.append(Flower(pos))
 
     def draw(self, window, camera):
         for tile in self.layer[0]:
             tile.draw(window, camera)
+
+    def drawDrops(self, window, camera):
+        for drop in self.drops:
+            drop.draw(window, camera)
 
 
 class Tile:

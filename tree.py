@@ -16,21 +16,21 @@ class Tree:
         self.clickRect = pygame.Rect(pos.x, pos.y, 128, 128)
         self.mask = "obj"
         self.status = "active"
-        self.hitcount = 100
+        self.hitcount = 500
 
-    def update(self, dt, events, camera):
+    def update(self, dt, events, camera, bub):
         if self.status == "active":
             if events["mouse_pressed"][0]:
                 point = camera.mouseToGamePos(events["mouse_pos"])
                 if self.clickRect.collidepoint(point.x, point.y):
                     if camera.getDistance(self.pos + pygame.Vector2(42+23, 106+5)) < 100:
-                        self.hitcount -= 1
+                        self.hitcount -= dt
                         camera.shake(dt, 2)
                         if self.hitcount < 1:
                             self.status = "destroyed"
 
-
-
+    def getCenter(self):
+        return self.pos + pygame.Vector2(42+23, 106+5)
 
     def draw(self, window, camera):
         if self.status == "active":

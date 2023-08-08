@@ -2,6 +2,7 @@ import pygame
 from bub import Bub
 from camera import Camera
 from map import Map
+from gui import GUI
 
 
 class Controller:
@@ -20,16 +21,19 @@ class GameController:
         self.bub = Bub()
         self.camera = Camera(self.bub.pos)
         self.map = Map()
+        self.gui = GUI()
 
     def update(self, dt, events):
         self.bub.collision.update_objects("tile", self.map.layer[0])
         self.bub.collision.update_objects("obj", self.map.layer[1])
         self.bub.update(dt, events)
         self.camera.update(dt, events, self.bub.rect.center)
-        self.map.update(dt, events, self.camera)
+        self.map.update(dt, events, self.camera, self.bub)
+        self.gui.update(self.bub.inventory)
 
     def draw(self, window):
         self.map.draw(window, self.camera)
+        self.map.drawDrops(window, self.camera)
         bubDrawn = False
         for obj in self.map.layer[1]:
             if not bubDrawn:
@@ -41,4 +45,5 @@ class GameController:
                     obj.draw(window, self.camera)
             else:
                 obj.draw(window, self.camera)
+        self.gui.draw(window)
 

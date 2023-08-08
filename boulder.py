@@ -13,8 +13,11 @@ class Boulder:
         self.status = "active"
         self.hitcount = 100
 
-    def update(self, dt, events, camera):
+    def update(self, dt, events, camera, bub):
         pass
+
+    def getCenter(self):
+        return self.pos + pygame.Vector2(42+23, 106+5)
 
     def draw(self, window, camera):
         window.blit(Boulder.sprites, camera.cameraPos(self.pos))
