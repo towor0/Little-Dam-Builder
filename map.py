@@ -19,6 +19,7 @@ class Map:
         self.load_tiles()
         self.load_objs()
         self.tileSheetAnim = 0
+        self.particles = []
         self.treeHit = {
             None: 500,
             "wooden_axe": 300,
@@ -76,6 +77,12 @@ class Map:
             tile.update(dt, events)
         for obj in self.layer[1]:
             obj.update(dt, events, camera, bub)
+            if type(obj).__name__ == "Tree":
+                if obj.particle:
+                    self.particles.append(Particle((random.randint(133, 153), random.randint(76, 96), random.randint(49, 69)), obj.getCenter()))
+            if type(obj).__name__ == "Boulder":
+                if obj.particle:
+                    self.particles.append(Particle((random.randint(128, 148), random.randint(128, 148), random.randint(128, 148)), obj.getCenter()))
             if obj.status == "destroyed":
                 if type(obj).__name__ == "Tree":
                     self.dropSticks(obj.getCenter())
@@ -107,6 +114,10 @@ class Map:
         elif bub.inventory.items["wooden_pick"] and not self.bouldercur:
             self.bouldercur = self.boulderhit["wooden_pick"]
             self.updateBoulders()
+        for particle in self.particles:
+            particle.update(dt, events)
+            if particle.destroy:
+                self.particles.pop(self.particles.index(particle))
 
     def updateTrees(self):
         for obj in self.layer[1]:
@@ -137,6 +148,10 @@ class Map:
     def draw(self, window, camera):
         for tile in self.layer[0]:
             tile.draw(window, camera)
+
+    def drawParticles(self, window, camera):
+        for particle in self.particles:
+            particle.draw(window, camera)
 
     def drawDrops(self, window, camera):
         for drop in self.drops:
@@ -183,3 +198,23 @@ class Tile:
 
     def draw(self, window, camera):
         window.blit(Tile.sprites[Tile.sheet], camera.cameraPos(self.pos), (self.tile[0], self.tile[1], self.tilesize, self.tilesize))
+
+
+class Particle:
+    def __init__(self, color, pos):
+        self.color = color
+        self.timer = 300
+        self.pos = pos
+        self.vel = pygame.Vector2((random.random()-.5)*3, (random.random()-.5)*3)
+        self.destroy = False
+
+    def update(self, dt, events):
+        self.vel.y -= dt
+        self.pos += self.vel * dt
+        self.timer -= dt
+        if self.timer < 0:
+            self.destroy = True
+
+    def draw(self, window, camera):
+        camPos = camera.cameraPos(self.pos)
+        pygame.draw.rect(window, self.color, (camPos.x, camPos.y, 2, 2))

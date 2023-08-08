@@ -18,6 +18,9 @@ class Controller:
             self.menu.update(dt, events)
         else:
             self.game.update(dt, events)
+            if self.game.gui.gameFinished:
+                self.menu = MenuController()
+                self.game = GameController()
 
     def draw(self, window):
         if not self.menu.started:
@@ -55,6 +58,9 @@ class GameController:
                     obj.draw(window, self.camera)
             else:
                 obj.draw(window, self.camera)
+        if not bubDrawn:
+            self.bub.draw(window, self.camera)
+        self.map.drawParticles(window, self.camera)
         self.gui.draw(window)
 
 

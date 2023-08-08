@@ -12,14 +12,17 @@ class Boulder:
         self.mask = "obj"
         self.status = "active"
         self.hitcount = None
+        self.particle = False
 
     def update(self, dt, events, camera, bub):
+        self.particle = False
         if self.hitcount != None:
             if self.status == "active":
                 if events["mouse_pressed"][0]:
                     point = camera.mouseToGamePos(events["mouse_pos"])
                     if self.clickRect.collidepoint(point.x, point.y):
                         if camera.getDistance(self.getCenter()) < 100:
+                            self.particle = True
                             self.hitcount -= dt
                             camera.shake(dt, 2)
                             if self.hitcount < 1:
